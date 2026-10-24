@@ -24,7 +24,7 @@ export default function MockBuying({session,onChange,onBack,onReal}:{session:Ses
  async function act(kind:'add'|'pay'){
   if(lock.current||kind==='add'&&!next||kind==='pay'&&(!confirmed||!cart.length))return;
   lock.current=true;setActivityOpen(true);setProcessing(kind==='add'?'Adding product to demo cart…':'Processing simulated payment…');
-  const item=next;const batch=[...cart];
+  const batch=[...cart];
   try{
    if(kind==='add'){
     const queue=unpurchased.filter(line=>!session.mockCart?.includes(key(line)));
@@ -53,10 +53,9 @@ export default function MockBuying({session,onChange,onBack,onReal}:{session:Ses
    const now=new Date().toISOString();const invoiceId=`DEMO-${crypto.randomUUID().slice(0,8).toUpperCase()}`;
    const bill=['GOALFIRST — SIMULATED BILL',`Reference: ${invoiceId}`,`Date: ${now}`,`Goal: ${session.plan?.title??session.input}`,'','DEMO ONLY — No payment processed. Not a merchant invoice or tax receipt.','',...batch.map(line=>{const price=cartSummary.find(c=>c.lineId===line.itemId);return `${line.productTitle} | Qty ${line.quantity} | Unit SGD ${price?.unitPriceSGD??'Unknown'} | Line SGD ${price?.lineCents==null?'Unknown':(price.lineCents/100).toFixed(2)}\nSource: ${line.productUrl}`;}),'',`${unknown?'Known item amount (incomplete)':'Listed item subtotal'}: SGD ${(total/100).toFixed(2)}`,'Shipping, taxes and final merchant charges: unverified.','Payment: simulated, no card charged.','Delivery: awaiting dispatch (simulated).'].join('\n');
    onChange(s=>{
-    if(kind==='add'&&item)return {...s,mockCart:[...new Set([...(s.mockCart??[]),key(item)])]};
     const updated={...s.mockPurchases};for(const line of batch)updated[key(line)]={itemId:line.itemId,productTitle:line.productTitle,productUrl:line.productUrl!,quantity:line.quantity,completedAt:new Date().toISOString()};
     return {...s,mockInvoices:[...(s.mockInvoices??[]),{id:invoiceId,createdAt:now,text:bill}].slice(-50),mockPurchases:updated,mockCart:(s.mockCart??[]).filter(k=>!batch.some(l=>key(l)===k))};
-   });activity(kind==='add'?`Added to demo cart: ${item!.productTitle}. Awaiting your next instruction.`:'Demo payment complete. Order recorded; bill ready to download or share by email.');setPayment(false);setConfirmed(false);setCelebrating(true);
+   });activity('Demo payment complete. Order recorded; bill ready to download or share by email.');setPayment(false);setConfirmed(false);setCelebrating(true);
   }finally{lock.current=false;setProcessing('');}
  }
  return <section className="buying-workspace buying-simple" aria-busy={!!processing}>
