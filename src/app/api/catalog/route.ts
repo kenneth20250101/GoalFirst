@@ -1,0 +1,2 @@
+import { catalog } from '@/lib/catalog';
+export function GET(request:Request){const id=new URL(request.url).searchParams.get('productId');const products=id?catalog.filter(p=>p.id===id):catalog;if(!products.length)return Response.json({error:'Unknown demo SKU'},{status:404});return Response.json({source:'GoalFirst local seeded catalog (src/lib/catalog.ts)',type:'fictional-demo-data',notice:'Not real merchant inventory. Prices and specifications are fixtures, not verified retail offers.',products});}
